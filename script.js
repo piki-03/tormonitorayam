@@ -5,8 +5,8 @@
 
 "use strict";
 
-const SUPABASE_URL = "https://gppdlvfxmecnheumjtat.supabase.co";
-const SUPABASE_KEY = "sb_publishable_imMN2v1DCxlnfmmGO-q8eQ_aJi9j9p-";
+const SUPABASE_URL = "https://qpztpjomwjmjknascvbl.supabase.co";
+const SUPABASE_KEY = "sb_publishable_yoaMdOt6gFP2cZ07m9UBeg_3ZWCbzaF";
 
 // Perbaikan Error: Menggunakan nama variabel yang berbeda dari library global
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
