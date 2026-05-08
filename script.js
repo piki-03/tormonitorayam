@@ -67,15 +67,14 @@ const DOM = {
 
 const ICON_SVG = {
 
-  // UMUM (plug) — model sama: stroke outline, rounded
+  // UMUM (plug) — dua tusuk colokan + badan, identik gaya dengan lampu/kipas
   plug: `<svg class="device-icon icon-plug" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M9 3v4M15 3v4"/>
-    <rect x="5" y="7" width="14" height="6" rx="2"/>
-    <path d="M12 13v4"/>
-    <path d="M9 17h6"/>
+    <path d="M5 7h14v5a7 7 0 0 1-14 0V7z"/>
+    <path d="M12 17v4M9 21h6"/>
   </svg>`,
 
-  // LAMPU (light) — tetap sama, sudah bagus
+  // LAMPU — tidak berubah
   light: `<svg class="device-icon icon-light" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
     <path d="M9 18h6M10 22h4"/>
@@ -84,35 +83,35 @@ const ICON_SVG = {
     <line class="light-ray r3" x1="19.78" y1="4.22" x2="18.36" y2="5.64"/>
   </svg>`,
 
-  // KIPAS (fan) — tetap sama, sudah bagus
+  // KIPAS — tidak berubah
   fan: `<svg class="device-icon icon-fan" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
     <path d="M12 6V3M12 21v-3M6 12H3M21 12h-3"/>
     <path d="M7.05 7.05 4.93 4.93M19.07 4.93l-2.12 2.12M7.05 16.95l-2.12 2.12M16.95 16.95l2.12 2.12"/>
   </svg>`,
 
-  // POMPA (pump) — stroke outline konsisten
+  // POMPA — tetes air (sama persis gaya dengan stok pakan di monitoring)
   pump: `<svg class="device-icon icon-pump" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M12 2a5 5 0 0 1 5 5c0 3-5 11-5 11S7 10 7 7a5 5 0 0 1 5-5z"/>
-    <circle cx="12" cy="7" r="2"/>
-    <line class="pump-drop p1" x1="12" y1="19" x2="12" y2="22"/>
-    <line class="pump-drop p2" x1="9"  y1="20" x2="8"  y2="22"/>
-    <line class="pump-drop p3" x1="15" y1="20" x2="16" y2="22"/>
+    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+    <circle class="pump-drop" cx="12" cy="14" r="2"/>
   </svg>`,
 
-  // PEMANAS (heat) — stroke outline konsisten
+  // PEMANAS — tiga gelombang panas vertikal + garis dasar
   heat: `<svg class="device-icon icon-heat" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <path class="heat-wave w1" d="M5 20c0-2 2-2 2-4s-2-2-2-4 2-2 2-4"/>
-    <path class="heat-wave w2" d="M12 20c0-2 2-2 2-4s-2-2-2-4 2-2 2-4"/>
-    <path class="heat-wave w3" d="M19 20c0-2 2-2 2-4s-2-2-2-4 2-2 2-4"/>
+    <path class="heat-wave w1" d="M8 2c0 3-3 3-3 6s3 3 3 6"/>
+    <path class="heat-wave w2" d="M12 2c0 3-3 3-3 6s3 3 3 6"/>
+    <path class="heat-wave w3" d="M16 2c0 3-3 3-3 6s3 3 3 6"/>
+    <path d="M5 20h14"/>
   </svg>`,
 
-  // PAKAN (feed) — stroke outline konsisten
+  // PAKAN — silo/tangki silinder (mirip konsep stok pakan ultrasonik)
   feed: `<svg class="device-icon icon-feed" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M3 11l19-9-9 19-2-8-8-2z"/>
-    <line class="feed-particle p1" x1="12" y1="12" x2="14" y2="14"/>
-    <line class="feed-particle p2" x1="10" y1="13" x2="9"  y2="15"/>
-    <line class="feed-particle p3" x1="13" y1="10" x2="15" y2="9"/>
+    <ellipse cx="12" cy="5" rx="8" ry="3"/>
+    <path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/>
+    <path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/>
+    <path class="feed-particle p1" d="M10 21.5 Q9 22.5 10 23.5"/>
+    <path class="feed-particle p2" d="M12 22 Q11 23 12 24"/>
+    <path class="feed-particle p3" d="M14 21.5 Q15 22.5 14 23.5"/>
   </svg>`,
 
 };
