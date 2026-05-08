@@ -135,14 +135,63 @@
       </div>
     </section>
 
-    <!-- ===== KONTROL SECTION ===== -->
-    <section class="section">
-      <div class="section__header">
-        <h2 class="section__title">Kontrol Perangkat</h2>
-        <span class="section__badge" id="device-count">2 Perangkat</span>
+  <!-- ===== KONTROL SECTION ===== -->
+<section class="section">
+  <div class="section__header">
+    <h2 class="section__title">Kontrol Perangkat</h2>
+    <div class="section__header-right">
+      <span class="section__badge" id="device-count">0 Perangkat</span>
+      <button class="btn-add-device" id="btn-add-device" title="Tambah Perangkat">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Tambah
+      </button>
+    </div>
+  </div>
+  <div class="control-grid" id="control-grid">
+    <!-- Card perangkat dirender dinamis oleh script.js -->
+  </div>
+</section>
+
+<!-- ===== MODAL TAMBAH PERANGKAT ===== -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal__header">
+      <h3 class="modal__title">Tambah Perangkat Baru</h3>
+      <button class="modal__close" id="modal-close">&times;</button>
+    </div>
+    <div class="modal__body">
+
+      <div class="form-group">
+        <label class="form-label">ID Perangkat <span class="form-hint">(unik, tanpa spasi)</span></label>
+        <input type="text" id="input-device-id" class="form-input" placeholder="contoh: pompa_air" />
       </div>
 
-      <div class="control-grid">
+      <div class="form-group">
+        <label class="form-label">Nama Perangkat</label>
+        <input type="text" id="input-device-label" class="form-input" placeholder="contoh: Pompa Air" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Ikon</label>
+        <div class="icon-picker" id="icon-picker">
+          <button class="icon-option selected" data-icon="plug">🔌 Umum</button>
+          <button class="icon-option" data-icon="light">💡 Lampu</button>
+          <button class="icon-option" data-icon="fan">🌀 Kipas</button>
+          <button class="icon-option" data-icon="pump">💧 Pompa</button>
+          <button class="icon-option" data-icon="heat">🔥 Pemanas</button>
+          <button class="icon-option" data-icon="bell">🔔 Alarm</button>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal__footer">
+      <button class="btn-cancel" id="btn-cancel-device">Batal</button>
+      <button class="btn-save" id="btn-save-device">Simpan Perangkat</button>
+    </div>
+  </div>
+</div>
 
         <!-- Kontrol Lampu -->
         <article class="control-card" id="card-lampu">

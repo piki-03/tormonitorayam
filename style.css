@@ -217,7 +217,7 @@ body {
   gap: 36px;
 }
 
-.section {}
+/* .section {} */
 
 .section__header {
   display: flex;
@@ -664,3 +664,194 @@ body {
   .monitoring-grid { grid-template-columns: 1fr 1fr 1fr; }
   .monitor-card--feed { grid-column: auto; flex-direction: column; }
 }
+
+/* ============================================================
+   TAMBAH PERANGKAT — Button & Modal
+   ============================================================ */
+
+.section__header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-add-device {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.85rem;
+  background: rgba(26, 86, 255, 0.15);
+  border: 1px solid rgba(26, 86, 255, 0.4);
+  border-radius: 20px;
+  color: #60a5fa;
+  font-size: 0.78rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.btn-add-device:hover {
+  background: rgba(26, 86, 255, 0.28);
+  border-color: #1A56FF;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.modal-overlay.is-open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Modal Box */
+.modal {
+  background: #0f172a;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 420px;
+  padding: 1.5rem;
+  transform: translateY(16px);
+  transition: transform 0.2s;
+}
+.modal-overlay.is-open .modal {
+  transform: translateY(0);
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+.modal__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+.modal__close {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 1.4rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s;
+}
+.modal__close:hover { color: #e2e8f0; }
+
+/* Form */
+.form-group { margin-bottom: 1rem; }
+.form-label {
+  display: block;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+}
+.form-hint {
+  font-size: 0.72rem;
+  color: #475569;
+}
+.form-input {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 0.55rem 0.8rem;
+  color: #e2e8f0;
+  font-size: 0.88rem;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.form-input:focus { border-color: #1A56FF; }
+.form-input::placeholder { color: #475569; }
+
+/* Icon Picker */
+.icon-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.icon-option {
+  padding: 0.35rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  color: #94a3b8;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.icon-option:hover { background: rgba(255,255,255,0.09); }
+.icon-option.selected {
+  border-color: #1A56FF;
+  background: rgba(26, 86, 255, 0.18);
+  color: #60a5fa;
+}
+
+/* Modal Footer */
+.modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1.4rem;
+}
+.btn-cancel {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: transparent;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+.btn-save {
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  background: #1A56FF;
+  color: #fff;
+  font-size: 0.85rem;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-save:hover { background: #1d4ed8; }
+.btn-save:disabled { background: #334155; cursor: not-allowed; }
+
+/* Tombol Hapus di card dinamis */
+.control-card__delete {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  color: #475569;
+  cursor: pointer;
+  padding: 0.2rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  transition: color 0.2s;
+  display: none;
+}
+.control-card:hover .control-card__delete { display: block; }
+.control-card__delete:hover { color: #ef4444; }
+
+.control-card { position: relative; }
