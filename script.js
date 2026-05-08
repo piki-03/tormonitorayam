@@ -62,16 +62,51 @@ const DOM = {
 };
 
 // ============================================================
-// ICON MAP
+// ICON MAP + ANIMASI CLASS
 // ============================================================
 
 const ICON_SVG = {
-  plug: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8H6a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2z"/></svg>`,
-  light: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6M10 22h4"/></svg>`,
-  fan: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M12 6V3M12 21v-3M6 12H3M21 12h-3"/><path d="M7.05 7.05 4.93 4.93M19.07 4.93l-2.12 2.12M7.05 16.95l-2.12 2.12M16.95 16.95l2.12 2.12"/></svg>`,
-  pump: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`,
-  heat: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="4"/></svg>`,
-  bell: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`,
+  plug: `<svg class="device-icon icon-plug" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 22v-5"/>
+    <path d="M9 8V2"/><path d="M15 8V2"/>
+    <path d="M18 8H6a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2z"/>
+  </svg>`,
+
+  light: `<svg class="device-icon icon-light" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+    <path d="M9 18h6M10 22h4"/>
+    <line class="light-ray r1" x1="12" y1="1" x2="12" y2="3"/>
+    <line class="light-ray r2" x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+    <line class="light-ray r3" x1="19.78" y1="4.22" x2="18.36" y2="5.64"/>
+  </svg>`,
+
+  fan: `<svg class="device-icon icon-fan" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+    <path d="M12 6V3M12 21v-3M6 12H3M21 12h-3"/>
+    <path d="M7.05 7.05 4.93 4.93M19.07 4.93l-2.12 2.12M7.05 16.95l-2.12 2.12M16.95 16.95l2.12 2.12"/>
+  </svg>`,
+
+  pump: `<svg class="device-icon icon-pump" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+    <line class="pump-drop" x1="12" y1="13" x2="12" y2="17"/>
+  </svg>`,
+
+  heat: `<svg class="device-icon icon-heat" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path class="heat-wave w1" d="M5 12c0-2 2-2 2-4s-2-2-2-4"/>
+    <path class="heat-wave w2" d="M12 12c0-2 2-2 2-4s-2-2-2-4"/>
+    <path class="heat-wave w3" d="M19 12c0-2 2-2 2-4s-2-2-2-4"/>
+    <path d="M5 22h14"/>
+    <path d="M5 18h14"/>
+  </svg>`,
+
+  feed: `<svg class="device-icon icon-feed" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="12" cy="5" rx="7" ry="3"/>
+    <path d="M5 5v6c0 1.66 3.13 3 7 3s7-1.34 7-3V5"/>
+    <path d="M5 11v6c0 1.66 3.13 3 7 3s7-1.34 7-3v-6"/>
+    <path class="feed-particle p1" d="M9 19.5 Q8 21 9 22"/>
+    <path class="feed-particle p2" d="M12 20 Q11 21.5 12 22.5"/>
+    <path class="feed-particle p3" d="M15 19.5 Q16 21 15 22"/>
+  </svg>`,
 };
 
 // ============================================================
@@ -92,7 +127,7 @@ function renderDeviceCard(id, label, icon, status) {
                   : icon === "fan"   ? "control-card__icon-wrap--fan"
                   : "control-card__icon-wrap--generic";
 
-  card.innerHTML = `
+card.innerHTML = `
     <button class="control-card__delete" data-id="${id}" title="Hapus perangkat">✕</button>
     <div class="control-card__icon-wrap ${iconClass}${status ? " active" : ""}" id="icon-${id}">
       ${ICON_SVG[icon] || ICON_SVG.plug}
@@ -107,6 +142,12 @@ function renderDeviceCard(id, label, icon, status) {
       <span class="toggle-switch__track"><span class="toggle-switch__thumb"></span></span>
     </label>
   `;
+
+  // Terapkan animasi jika status awal ON
+  if (status) {
+    const svg = card.querySelector(".device-icon");
+    if (svg) svg.classList.add("anim-on");
+  }
 
   DOM.controlGrid.appendChild(card);
 
@@ -125,21 +166,23 @@ function renderDeviceCard(id, label, icon, status) {
 function updateSwitchUI(id, status) {
   state.devices[id] = { ...state.devices[id], status };
 
-  const card  = document.getElementById(`card-${id}`);
-  const btn   = document.getElementById(`btn-${id}`);
-  const stEl  = document.getElementById(`state-${id}`);
-  const icon  = document.getElementById(`icon-${id}`);
+  const card = document.getElementById(`card-${id}`);
+  const btn  = document.getElementById(`btn-${id}`);
+  const stEl = document.getElementById(`state-${id}`);
+  const iconWrap = document.getElementById(`icon-${id}`);
 
   if (!card) return;
 
   if (btn)  btn.checked = status;
   if (stEl) stEl.textContent = status ? "NYALA" : "MATI";
-  if (icon) icon.classList.toggle("active", status);
+  if (iconWrap) iconWrap.classList.toggle("active", status);
   card.classList.toggle("is-active", status);
 
-  // Animasi kipas
-  const fanSvg = card.querySelector(".fan-icon");
-  if (fanSvg) fanSvg.classList.toggle("fan-spinning", status);
+  // Toggle animasi: tambah class "anim-on" ke SVG icon
+  if (iconWrap) {
+    const svg = iconWrap.querySelector(".device-icon");
+    if (svg) svg.classList.toggle("anim-on", status);
+  }
 }
 
 function updateDeviceCount() {
