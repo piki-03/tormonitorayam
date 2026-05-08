@@ -66,12 +66,16 @@ const DOM = {
 // ============================================================
 
 const ICON_SVG = {
+
+  // UMUM (plug) — model sama: stroke outline, rounded
   plug: `<svg class="device-icon icon-plug" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M12 22v-5"/>
-    <path d="M9 8V2"/><path d="M15 8V2"/>
-    <path d="M18 8H6a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2z"/>
+    <path d="M9 3v4M15 3v4"/>
+    <rect x="5" y="7" width="14" height="6" rx="2"/>
+    <path d="M12 13v4"/>
+    <path d="M9 17h6"/>
   </svg>`,
 
+  // LAMPU (light) — tetap sama, sudah bagus
   light: `<svg class="device-icon icon-light" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
     <path d="M9 18h6M10 22h4"/>
@@ -80,33 +84,37 @@ const ICON_SVG = {
     <line class="light-ray r3" x1="19.78" y1="4.22" x2="18.36" y2="5.64"/>
   </svg>`,
 
+  // KIPAS (fan) — tetap sama, sudah bagus
   fan: `<svg class="device-icon icon-fan" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
     <path d="M12 6V3M12 21v-3M6 12H3M21 12h-3"/>
     <path d="M7.05 7.05 4.93 4.93M19.07 4.93l-2.12 2.12M7.05 16.95l-2.12 2.12M16.95 16.95l2.12 2.12"/>
   </svg>`,
 
+  // POMPA (pump) — stroke outline konsisten
   pump: `<svg class="device-icon icon-pump" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
-    <line class="pump-drop" x1="12" y1="13" x2="12" y2="17"/>
+    <path d="M12 2a5 5 0 0 1 5 5c0 3-5 11-5 11S7 10 7 7a5 5 0 0 1 5-5z"/>
+    <circle cx="12" cy="7" r="2"/>
+    <line class="pump-drop p1" x1="12" y1="19" x2="12" y2="22"/>
+    <line class="pump-drop p2" x1="9"  y1="20" x2="8"  y2="22"/>
+    <line class="pump-drop p3" x1="15" y1="20" x2="16" y2="22"/>
   </svg>`,
 
+  // PEMANAS (heat) — stroke outline konsisten
   heat: `<svg class="device-icon icon-heat" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <path class="heat-wave w1" d="M5 12c0-2 2-2 2-4s-2-2-2-4"/>
-    <path class="heat-wave w2" d="M12 12c0-2 2-2 2-4s-2-2-2-4"/>
-    <path class="heat-wave w3" d="M19 12c0-2 2-2 2-4s-2-2-2-4"/>
-    <path d="M5 22h14"/>
-    <path d="M5 18h14"/>
+    <path class="heat-wave w1" d="M5 20c0-2 2-2 2-4s-2-2-2-4 2-2 2-4"/>
+    <path class="heat-wave w2" d="M12 20c0-2 2-2 2-4s-2-2-2-4 2-2 2-4"/>
+    <path class="heat-wave w3" d="M19 20c0-2 2-2 2-4s-2-2-2-4 2-2 2-4"/>
   </svg>`,
 
+  // PAKAN (feed) — stroke outline konsisten
   feed: `<svg class="device-icon icon-feed" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <ellipse cx="12" cy="5" rx="7" ry="3"/>
-    <path d="M5 5v6c0 1.66 3.13 3 7 3s7-1.34 7-3V5"/>
-    <path d="M5 11v6c0 1.66 3.13 3 7 3s7-1.34 7-3v-6"/>
-    <path class="feed-particle p1" d="M9 19.5 Q8 21 9 22"/>
-    <path class="feed-particle p2" d="M12 20 Q11 21.5 12 22.5"/>
-    <path class="feed-particle p3" d="M15 19.5 Q16 21 15 22"/>
+    <path d="M3 11l19-9-9 19-2-8-8-2z"/>
+    <line class="feed-particle p1" x1="12" y1="12" x2="14" y2="14"/>
+    <line class="feed-particle p2" x1="10" y1="13" x2="9"  y2="15"/>
+    <line class="feed-particle p3" x1="13" y1="10" x2="15" y2="9"/>
   </svg>`,
+
 };
 
 // ============================================================
