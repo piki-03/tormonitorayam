@@ -5,8 +5,8 @@
 
 "use strict";
 
-const SUPABASE_URL = "https://qpztpjomwjmjknascvbl.supabase.co";
-const SUPABASE_KEY = "sb_publishable_yoaMdOt6gFP2cZ07m9UBeg_3ZWCbzaF";
+const SUPABASE_URL = "https://iypfmqutatzkaiuebnrb.supabase.co";
+const SUPABASE_KEY = "sb_publishable_1EB2aj89OPPBFpTc8f9vuw_5nzuIclm";
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
