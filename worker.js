@@ -1,217 +1,219 @@
-/*
- * TORMONITOR AYAM — Cloudflare Worker
- * Handles: sensor ingestion, calculation, control relay
- */
 
-const SUPABASE_URL = "https://gppdlvfxmecnheumjtat.supabase.co";
-const SUPABASE_KEY = "sb_publishable_imMN2v1DCxlnfmmGO-q8eQ_aJi9j9p-";
+// ── KONFIGURASI ────────────────────────────────────────────────
+const SB_URL = "https://iypfmqutatzkaiuebnrb.supabase.co";
 
-// Konfigurasi perhitungan sensor
-const CONFIG = {
-  suhu: {
-    min_optimal: 24,
-    max_optimal: 30,
-  },
-  kelembapan: {
-    max_ideal: 75,
-  },
-  pakan: {
-    jarak_kosong: 30.0,  // cm = 0%
-    jarak_penuh:   5.0,  // cm = 100%
-    kritis: 15,          // % threshold
-  },
+// ⚠️ GANTI DENGAN ANON KEY ASLI DARI:
+// Supabase Dashboard → Project Settings → API → anon public
+// Key asli berbentuk JWT panjang dimulai: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+const SB_KEY = "sb_publishable_1EB2aj89OPPBFpTc8f9vuw_5nzuIclm";
+
+const CFG = {
+  suhu:  { min: 24, max: 30 },
+  humid: { max_ideal: 75 },
+  pakan: { kosong: 5.0, penuh: 0.5, kritis: 15 },
 };
 
-// ============================================================
-// ROUTER UTAMA
-// ============================================================
+const CORS = {
+  "Access-Control-Allow-Origin":  "*",
+  "Access-Control-Allow-Methods": "GET, POST, PATCH, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
 
+// ── ROUTER ─────────────────────────────────────────────────────
 export default {
-  async fetch(request, env) {
-    const url    = new URL(request.url);
-    const method = request.method;
+  async fetch(req) {
+    const url    = new URL(req.url);
+    const method = req.method;
+    const path   = url.pathname;
 
-    // CORS headers
-    const cors = {
-      "Access-Control-Allow-Origin":  "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, X-Device-Key",
-    };
-
-    if (method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: cors });
-    }
+    if (method === "OPTIONS") return resp(null, 204);
 
     try {
-      // POST /sensor  — ESP32 kirim data mentah
-      if (url.pathname === "/sensor" && method === "POST") {
-        return await handleSensor(request, env, cors);
+      if (path === "/pins" && method === "POST") return await sensorWrite(req);
+      if (path === "/pins" && method === "GET")  return await allPinsRead();
+
+      if (path.startsWith("/pin/")) {
+        const pin = path.split("/")[2]?.toUpperCase();
+        if (!pin?.match(/^V\d+$/)) return resp({ error: "Pin tidak valid" }, 400);
+        if (method === "GET")  return await pinRead(pin);
+        if (method === "POST") return await pinWrite(pin, req);
       }
 
-      // GET /control  — ESP32 polling status lampu & kipas
-      if (url.pathname === "/control" && method === "GET") {
-        return await handleControl(request, env, cors);
+      if (path === "/control") {
+        if (method === "GET")  return await legacyControlRead();
+        if (method === "POST") return await legacyControlWrite(req);
       }
 
-      // POST /control — Dashboard web update status
-      if (url.pathname === "/control" && method === "POST") {
-        return await handleControlUpdate(request, env, cors);
-      }
-
-      return jsonResponse({ error: "Not found" }, 404, cors);
-
-    } catch (err) {
-      return jsonResponse({ error: err.message }, 500, cors);
+      return resp({ error: "Not found" }, 404);
+    } catch (e) {
+      console.error("[Worker] Unhandled error:", e.message, e.stack);
+      return resp({ error: e.message }, 500);
     }
   },
 };
 
-// ============================================================
-// HANDLER: ESP32 kirim data sensor mentah
-// POST /sensor
-// Body: { "suhu": 29.5, "kelembapan": 68.2, "jarak_cm": 12.3 }
-// ============================================================
-
-async function handleSensor(request, env, cors) {
-  const body = await request.json();
-
-  const { suhu, kelembapan, jarak_cm } = body;
-
-  // Validasi input
-  if (suhu === undefined || kelembapan === undefined || jarak_cm === undefined) {
-    return jsonResponse({ error: "Field suhu, kelembapan, jarak_cm wajib diisi" }, 400, cors);
+// ── POST /pins — Terima V1, V2, V3 dari ESP32 ─────────────────
+async function sensorWrite(req) {
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return resp({ error: "Body bukan JSON valid" }, 400);
   }
 
-  // ── Kalkulasi stok pakan dari jarak ultrasonik ──
-  const { jarak_kosong, jarak_penuh } = CONFIG.pakan;
-  let stok_pakan = ((jarak_kosong - jarak_cm) / (jarak_kosong - jarak_penuh)) * 100;
-  stok_pakan = Math.min(100, Math.max(0, stok_pakan));
-  stok_pakan = Math.round(stok_pakan * 100) / 100;
+  const suhu       = parseFloat(body.V1);
+  const kelembapan = parseFloat(body.V2);
+  const jarak_cm   = parseFloat(body.V3);
 
-  // ── Status suhu ──
-  let status_suhu;
-  if (suhu < CONFIG.suhu.min_optimal)       status_suhu = "rendah";
-  else if (suhu <= CONFIG.suhu.max_optimal)  status_suhu = "optimal";
-  else                                        status_suhu = "panas";
+  // Validasi: V1 & V2 wajib ada dan valid. V3 boleh NaN (sensor rusak → stok_pakan = 0)
+  if (isNaN(suhu) || isNaN(kelembapan)) {
+    return resp({ error: "V1 (suhu) dan V2 (kelembapan) wajib ada dan berupa angka" }, 400);
+  }
 
-  // ── Status kelembapan ──
-  const status_kelembapan = kelembapan <= CONFIG.kelembapan.max_ideal ? "ideal" : "lembap";
+  // Hitung stok pakan dari jarak (jika V3 tidak valid, set 0)
+  let stok_pakan = 0;
+  if (!isNaN(jarak_cm)) {
+    const { kosong, penuh } = CFG.pakan;
+    stok_pakan = ((kosong - jarak_cm) / (kosong - penuh)) * 100;
+    stok_pakan = +Math.min(100, Math.max(0, stok_pakan)).toFixed(2);
+  }
 
-  // ── Status pakan ──
-  const status_pakan = stok_pakan <= CONFIG.pakan.kritis ? "kritis" : "tersedia";
-
-  // ── Simpan ke Supabase ──
-  const payload = {
-    suhu:              Math.round(suhu * 100) / 100,
-    kelembapan:        Math.round(kelembapan * 100) / 100,
-    jarak_cm:          Math.round(jarak_cm * 100) / 100,
+  // INSERT hanya kolom yang ADA di schema SQL Anda
+  // Jika Anda sudah jalankan ALTER TABLE (tambah jarak_cm, status_*),
+  // uncomment bagian opsional di bawah
+  const log = {
+    suhu:       +suhu.toFixed(2),
+    kelembapan: +kelembapan.toFixed(2),
     stok_pakan,
-    status_suhu,
-    status_kelembapan,
-    status_pakan,
+    // ── Uncomment jika sudah ALTER TABLE ──────────────────────
+    // jarak_cm:          isNaN(jarak_cm) ? null : +jarak_cm.toFixed(2),
+    // status_suhu:       suhu < CFG.suhu.min ? "rendah" : suhu <= CFG.suhu.max ? "optimal" : "panas",
+    // status_kelembapan: kelembapan <= CFG.humid.max_ideal ? "ideal" : "lembap",
+    // status_pakan:      stok_pakan <= CFG.pakan.kritis ? "kritis" : "tersedia",
   };
 
-  const res = await supabaseFetch(
-    "/rest/v1/tormonitor_ayam_logs",
-    "POST",
-    payload
-  );
+  console.log("[sensorWrite] Mencoba INSERT:", JSON.stringify(log));
 
-  if (!res.ok) {
-    const err = await res.text();
-    return jsonResponse({ error: "Supabase error", detail: err }, 502, cors);
+  const r = await sb("/rest/v1/tormonitor_ayam_logs", "POST", log);
+
+  if (!r.ok) {
+    const detail = await r.text();
+    console.error("[sensorWrite] Supabase INSERT gagal:", r.status, detail);
+    return resp({ error: "Supabase insert gagal", sb_status: r.status, detail }, 502);
   }
 
-  return jsonResponse({
-    success: true,
-    kalkulasi: {
-      stok_pakan,
-      status_suhu,
-      status_kelembapan,
-      status_pakan,
-    },
-  }, 201, cors);
+  console.log("[sensorWrite] INSERT sukses. suhu=" + suhu + " humid=" + kelembapan);
+
+  // Kirim balik status semua saklar ke ESP32
+  const pins = await getPinsMap();
+  return resp({
+    ok: true,
+    stok_pakan,
+    status_suhu:       suhu < CFG.suhu.min ? "rendah" : suhu <= CFG.suhu.max ? "optimal" : "panas",
+    status_kelembapan: kelembapan <= CFG.humid.max_ideal ? "ideal" : "lembap",
+    status_pakan:      stok_pakan <= CFG.pakan.kritis ? "kritis" : "tersedia",
+    pins,
+  }, 201);
 }
 
-// ============================================================
-// HANDLER: ESP32 polling status kontrol
-// GET /control
-// Response: { "lampu": true, "kipas": false }
-// ============================================================
-
-async function handleControl(request, env, cors) {
-  const res = await supabaseFetch(
-    "/rest/v1/tormonitor_ayam_controls?select=id,status",
-    "GET"
-  );
-
-  if (!res.ok) {
-    return jsonResponse({ error: "Gagal ambil data kontrol" }, 502, cors);
-  }
-
-  const data = await res.json();
-
-  const result = { lampu: false, kipas: false };
-  data.forEach(item => {
-    if (item.id === "lampu") result.lampu = item.status;
-    if (item.id === "kipas") result.kipas = item.status;
-  });
-
-  return jsonResponse(result, 200, cors);
+// ── GET /pins — Semua status saklar { V10:1, V11:0, ... } ─────
+async function allPinsRead() {
+  const pins = await getPinsMap();
+  return resp(pins);
 }
 
-// ============================================================
-// HANDLER: Dashboard update status kontrol
-// POST /control
-// Body: { "id": "lampu", "status": true }
-// ============================================================
+// ── GET /pin/Vxx ───────────────────────────────────────────────
+async function pinRead(pin) {
+  const num = parseInt(pin.slice(1));
 
-async function handleControlUpdate(request, env, cors) {
-  const { id, status } = await request.json();
-
-  if (!["lampu", "kipas"].includes(id)) {
-    return jsonResponse({ error: "id harus 'lampu' atau 'kipas'" }, 400, cors);
+  if (num >= 1 && num <= 9) {
+    const r    = await sb("/rest/v1/tormonitor_ayam_logs?select=suhu,kelembapan,stok_pakan&order=created_at.desc&limit=1", "GET");
+    const data = await r.json();
+    if (!data.length) return resp({ pin, value: 0 });
+    const map = { V1: data[0].suhu, V2: data[0].kelembapan, V3: data[0].stok_pakan };
+    return resp({ pin, value: map[pin] ?? 0 });
   }
 
-  const res = await supabaseFetch(
-    `/rest/v1/tormonitor_ayam_controls?id=eq.${id}`,
+  const devs = await getControlsOrdered();
+  const idx  = num - 10;
+  if (!devs[idx]) return resp({ pin, value: 0, note: "Pin tidak ada perangkatnya" });
+  return resp({ pin, value: devs[idx].status ? 1 : 0, id: devs[idx].id });
+}
+
+// ── POST /pin/Vxx — Toggle satu saklar ────────────────────────
+async function pinWrite(pin, req) {
+  let body;
+  try { body = await req.json(); } catch { return resp({ error: "Body bukan JSON valid" }, 400); }
+
+  const num = parseInt(pin.slice(1));
+  if (num < 10) return resp({ error: "Pin sensor V1-V9 tidak bisa ditulis lewat /pin" }, 400);
+
+  const devs = await getControlsOrdered();
+  const idx  = num - 10;
+  if (!devs[idx]) return resp({ error: `Tidak ada perangkat untuk ${pin}` }, 404);
+
+  const status = body.value === 1 || body.value === true || body.value === "1";
+  const r = await sb(
+    `/rest/v1/tormonitor_ayam_controls?id=eq.${encodeURIComponent(devs[idx].id)}`,
     "PATCH",
     { status }
   );
-
-  if (!res.ok) {
-    return jsonResponse({ error: "Gagal update kontrol" }, 502, cors);
-  }
-
-  return jsonResponse({ success: true, id, status }, 200, cors);
+  if (!r.ok) return resp({ error: "Gagal update" }, 502);
+  return resp({ pin, value: status ? 1 : 0, id: devs[idx].id });
 }
 
-// ============================================================
-// HELPER: Supabase REST call
-// ============================================================
+// ── Legacy GET /control ────────────────────────────────────────
+async function legacyControlRead() {
+  const devs   = await getControlsOrdered();
+  const result = {};
+  devs.forEach(d => { result[d.id] = d.status; });
+  return resp(result);
+}
 
-async function supabaseFetch(path, method, body = null) {
-  const headers = {
-    "Content-Type":  "application/json",
-    "apikey":        SUPABASE_KEY,
-    "Authorization": `Bearer ${SUPABASE_KEY}`,
-    "Prefer":        "return=minimal",
-  };
+// ── Legacy POST /control ───────────────────────────────────────
+async function legacyControlWrite(req) {
+  let body;
+  try { body = await req.json(); } catch { return resp({ error: "Body bukan JSON valid" }, 400); }
+  const { id, status } = body;
+  const r = await sb(
+    `/rest/v1/tormonitor_ayam_controls?id=eq.${encodeURIComponent(id)}`,
+    "PATCH",
+    { status }
+  );
+  if (!r.ok) return resp({ error: "Gagal update" }, 502);
+  return resp({ ok: true, id, status });
+}
 
-  return fetch(`${SUPABASE_URL}${path}`, {
+// ── HELPERS ────────────────────────────────────────────────────
+
+async function getControlsOrdered() {
+  const r = await sb("/rest/v1/tormonitor_ayam_controls?select=id,status&order=id.asc", "GET");
+  return r.ok ? await r.json() : [];
+}
+
+async function getPinsMap() {
+  const devs = await getControlsOrdered();
+  const pins = {};
+  devs.forEach((d, i) => { pins[`V${10 + i}`] = d.status ? 1 : 0; });
+  return pins;
+}
+
+async function sb(path, method, body = null) {
+  return fetch(`${SB_URL}${path}`, {
     method,
-    headers,
+    headers: {
+      "Content-Type":  "application/json",
+      "apikey":        SB_KEY,
+      "Authorization": `Bearer ${SB_KEY}`,
+      "Prefer":        method === "POST" ? "return=minimal" : "",
+    },
     body: body ? JSON.stringify(body) : undefined,
   });
 }
 
-// ============================================================
-// HELPER: JSON Response
-// ============================================================
-
-function jsonResponse(data, status = 200, cors = {}) {
-  return new Response(JSON.stringify(data), {
+function resp(data, status = 200) {
+  return new Response(data === null ? null : JSON.stringify(data), {
     status,
-    headers: { "Content-Type": "application/json", ...cors },
+    headers: { "Content-Type": "application/json", ...CORS },
   });
 }
